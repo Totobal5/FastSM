@@ -1,0 +1,8 @@
+{
+  "FolderOrderSettings": [],
+  "ResourceOrderSettings": [
+    {"name":"oTest","order":3,"path":"objects/oTest/oTest.yy",},
+    {"name":"FastSM","order":2,"path":"scripts/FastSM/FastSM.yy",},
+    {"name":"Room1","order":1,"path":"rooms/Room1/Room1.yy",},
+  ],
+}
