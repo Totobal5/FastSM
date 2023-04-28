@@ -1,5 +1,5 @@
 // Feather ignore all
-#macro __FASTSM_VERSION "1.0"
+#macro __FASTSM_VERSION "1.1"
 #macro __FASTSM_ENABLE_SAFETY   true
 #macro __FASTSM_ENABLE_WARNINGS true
 #macro __FASTSM_ENABLE_LOGGING  false
@@ -30,6 +30,9 @@ function FastSM(_size, _trigger_count) constructor
 	
 	/// @ignore index of currently active state
 	__state_active = 0;
+	
+	/// @ignore index of the previous state
+	__state_previous = 0;
 	
 	/// @ignore amount of total triggers
 	__trigger_count = _trigger_count;
@@ -215,7 +218,8 @@ function FastSM(_size, _trigger_count) constructor
 		_current_state[$ "leave"](_current_state, _next_state);
 		
 		__time = get_timer();
-		__state_active = _id;
+		__state_previous = __state_active;
+		__state_active   = _id;
 		
 		var _previous_state = _current_state;
 		var _current_state  = __states[__state_active];
@@ -231,6 +235,12 @@ function FastSM(_size, _trigger_count) constructor
 			i = i + 1;
 		}
 		
+	}
+	
+	
+	static change_previous = function()
+	{
+		return change(__state_previous);
 	}
 	
 	
@@ -261,13 +271,28 @@ function FastSM(_size, _trigger_count) constructor
 	/// @desc Return the active state
 	static get_current = function() 
 	{
-		static dcurrent = {
-			name: "name", enter: function() {}, leave: function() {}
-		}
-		return is_struct(dcurrent) ? __states[__state_active] : dcurrent ;
+		return __states[__state_active];
 	}
 	
+	/// @return {real}
+	static get_current_index = function()
+	{
+		return __state_active;
+	}
 	
+	/// @desc Return the previous state
+	static get_previous = function()
+	{
+		return __states[__state_previous];
+	}
+	
+	/// @return {real}
+	static get_previous_index = function()
+	{
+		return __state_previous;
+	}
+
+
 	/// @returns {real} current active state time in microseconds
 	static get_time  = function() 
 	{
@@ -352,7 +377,7 @@ function FastSM(_size, _trigger_count) constructor
 			}
 			
 			var _mask  = 0x00;
-			
+			_state[$ "index"] = i;
 			_state[$ "tags"] ??= noone;
 			_state[$ "tags"] = is_array(_state[$ "tags"]) ? _state[$ "tags"] : [_state[$ "tags"]];
 			var _tags = _state[$ "tags"];
